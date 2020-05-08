@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "64580580235",
+    "firebase_url": "https://study-assistant-9f2d3.firebaseio.com",
+    "project_id": "study-assistant-9f2d3",
+    "storage_bucket": "study-assistant-9f2d3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64580580235:android:6a57e4480574818722358e",
+        "android_client_info": {
+          "package_name": "com.example.studyassistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "64580580235-bnftg8l6op0mm3a948h3t60u9u1cjvj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCWDSrINXnvzTYNvZGvpwbwasz44Dnuyw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64580580235-bnftg8l6op0mm3a948h3t60u9u1cjvj8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

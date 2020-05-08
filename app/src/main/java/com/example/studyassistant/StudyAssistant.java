@@ -1,0 +1,13 @@
+package com.example.studyassistant;
+
+import android.app.Application;
+
+import com.firebase.client.Firebase;
+
+public class StudyAssistant extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Firebase.setAndroidContext(this);
+    }
+}
