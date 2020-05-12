@@ -33,7 +33,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
         mFirebaseAuth = FirebaseAuth.getInstance();
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         mDatabaseUsers.keepSynced(true);

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menuItemDashboard"
+        android:title="Dashboard"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menuItemSchedules"
+        android:title="Schedules"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menuItemSession"
+        android:title="Session"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menuItemReports"
+        android:title="Reports"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menuItemAccount"
+        android:title="Account"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menuItemLogOut"
+        android:title="Logout"
+        app:showAsAction="never" />
+</menu>

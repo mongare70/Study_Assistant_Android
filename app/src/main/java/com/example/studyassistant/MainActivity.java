@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,4 +66,41 @@ public class MainActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuItemDashboard:
+                Intent openDashboard = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(openDashboard);
+                return true;
+            case R.id.menuItemSchedules:
+                Intent createSchedule = new Intent(MainActivity.this, CreateScheduleActivity.class);
+                startActivity(createSchedule);
+                return true;
+            case R.id.menuItemSession:
+                Toast.makeText(this, "Session selected", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.menuItemReports:
+                Toast.makeText(this, "Reports selected", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.menuItemAccount:
+                Intent openAccount = new Intent(MainActivity.this, AccountActivity.class);
+                startActivity(openAccount);
+                return true;
+            case R.id.menuItemLogOut:
+                Intent logOut = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(logOut);
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

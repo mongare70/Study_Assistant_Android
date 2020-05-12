@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AccountActivity">
+
+    <TextView
+        android:id="@+id/textViewName"
+        android:text="Name"
+        android:layout_marginLeft="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/textViewName1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/textViewName"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/textViewEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewName1"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Email" />
+
+    <TextView
+        android:id="@+id/textViewEmail1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@id/textViewName1"
+        android:layout_toRightOf="@+id/textViewEmail"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/textViewInstitution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewEmail1"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Institution" />
+
+    <TextView
+        android:id="@+id/textViewInstitution1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewEmail1"
+        android:layout_toRightOf="@id/textViewInstitution"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/textViewGender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewInstitution1"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Gender" />
+
+    <TextView
+        android:id="@+id/textViewGender1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewInstitution1"
+        android:layout_toRightOf="@+id/textViewGender"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:id="@+id/buttonEditProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewGender"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:text="Edit Profile"/>
+</RelativeLayout>

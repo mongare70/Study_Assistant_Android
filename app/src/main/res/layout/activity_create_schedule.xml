@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CreateScheduleActivity">
+
+    <TextView
+        android:id="@+id/textViewEnterModuleNameAndRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:text="Enter Module Name and Difficulty"/>
+
+    <TextView
+        android:id="@+id/textViewModule"
+        android:layout_below="@+id/textViewEnterModuleNameAndRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:text="Module"/>
+
+    <EditText
+        android:id="@+id/editTextModule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:ems="10"
+        android:layout_below="@+id/textViewEnterModuleNameAndRating"
+        android:layout_toRightOf="@+id/textViewModule"/>
+
+    <Button
+        android:id="@+id/buttonAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewEnterModuleNameAndRating"
+        android:layout_toRightOf="@id/editTextModule"
+        android:text="Add"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/textViewDifficulty"
+        android:layout_below="@+id/buttonAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:text="Difficulty"/>
+
+    <SeekBar
+        android:id="@+id/seekBarDifficulty"
+        android:max="10"
+        android:progress="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewDifficulty"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/textViewScheduleDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/seekBarDifficulty"
+        android:layout_centerHorizontal="true"
+        android:text="Schedule Details"/>
+
+    <TextView
+        android:id="@+id/textViewDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/textViewScheduleDetails"
+        android:layout_marginLeft="10dp"
+        android:text="Details"/>
+
+    <EditText
+        android:id="@+id/editTextStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Start"
+        android:clickable="true"
+        android:editable="false"
+        android:layout_marginTop="20dp"
+        android:ems="5"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/textViewDetails"
+        android:layout_below="@+id/textViewScheduleDetails"/>
+
+    <TextView
+        android:id="@+id/textViewTo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="to"
+        android:layout_marginTop="20dp"
+        android:layout_toRightOf="@id/editTextStart"
+        android:layout_below="@id/textViewScheduleDetails"/>
+
+    <EditText
+        android:id="@+id/editTextEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="End"
+        android:clickable="true"
+        android:editable="false"
+        android:layout_marginTop="20dp"
+        android:ems="5"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/textViewTo"
+        android:layout_below="@+id/textViewScheduleDetails"/>
+
+    <TextView
+        android:id="@+id/textViewStudyHoursPerDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_below="@+id/editTextEnd"
+        android:layout_marginLeft="10dp"
+        android:text="Study Hours Per Day"/>
+
+    <Spinner
+        android:id="@+id/spinnerWeekdays"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Start"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/textViewStudyHoursPerDay"
+        android:layout_below="@+id/editTextEnd"/>
+
+    <TextView
+        android:id="@+id/textViewWeekdays"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Weekdays"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@id/editTextEnd"
+        android:layout_toRightOf="@id/textViewStudyHoursPerDay"/>
+
+    <Spinner
+        android:id="@+id/spinnerWeekends"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="35dp"
+        android:layout_toRightOf="@+id/spinnerWeekdays"
+        android:layout_below="@+id/editTextEnd"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Weekends"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="35dp"
+        android:layout_below="@id/editTextEnd"
+        android:layout_toRightOf="@id/spinnerWeekdays"/>
+
+    <ListView
+        android:id="@+id/listViewScheduleDetails"
+        android:layout_marginTop="40dp"
+        android:layout_width="350dp"
+        android:layout_height="300dp"
+        android:layout_below="@+id/textViewWeekdays"
+        android:layout_marginLeft="20dp"/>
+
+    <Button
+        android:id="@+id/buttonCreateSchedule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/listViewScheduleDetails"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:text="Create Schedule"/>
+
+</RelativeLayout>

@@ -28,7 +28,6 @@ public class RegisterActivity extends AppCompatActivity {
     private Button buttonRegister;
     private DatabaseReference mDatabaseUsers;
     private ProgressDialog mProgress;
-
     private FirebaseAuth mFirebaseAuth;
 
     @Override
@@ -111,9 +110,10 @@ public class RegisterActivity extends AppCompatActivity {
                     else {
                         String user_id = mFirebaseAuth.getCurrentUser().getUid();
                         DatabaseReference current_user_db = mDatabaseUsers.child(user_id);
-                        current_user_db.child("Name").setValue(name);
-                        current_user_db.child("Institution").setValue(institution);
-                        current_user_db.child("Sex").setValue(sex);
+                        current_user_db.child("name").setValue(name);
+                        current_user_db.child("email").setValue(email);
+                        current_user_db.child("institution").setValue(institution);
+                        current_user_db.child("sex").setValue(sex);
 
                         mProgress.dismiss();
                         Toast.makeText(RegisterActivity.this, "Registration Complete", Toast.LENGTH_SHORT).show();
