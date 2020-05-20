@@ -218,7 +218,7 @@ public class CreateScheduleActivity extends AppCompatActivity{
     }
     //Session Creator Function
     public void sessionCreator(Schedule schedule, String[][] modules1){
-
+        
     }
 
     //Module Creator Function
