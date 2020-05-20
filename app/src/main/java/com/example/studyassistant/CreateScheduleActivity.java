@@ -1,10 +1,9 @@
 package com.example.studyassistant;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -13,30 +12,39 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
+import java.util.Date;
 import java.util.Locale;
 
-public class CreateScheduleActivity extends AppCompatActivity {
+public class CreateScheduleActivity extends AppCompatActivity{
+    private TextView textViewSeekBarDifficulty;
     private EditText editTextModule, editTextStart, editTextEnd;
     private SeekBar seekBarDifficulty;
     private Spinner spinnerWeekdays, spinnerWeekends;
     private Button buttonAdd, buttonCreateSchedule;
-    private ListView listView;
-
-
-    public CreateScheduleActivity() {
-    }
+    private ListView listViewModule, listViewRating;
+    private DatabaseReference mDatabaseSchedule, mDatabaseUsers;
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_schedule);
+
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mDatabaseUsers = FirebaseDatabase.getInstance().getReference("Users");
+        mDatabaseSchedule = FirebaseDatabase.getInstance().getReference("Schedules");
 
         editTextModule = findViewById(R.id.editTextModule);
 
@@ -80,9 +88,27 @@ public class CreateScheduleActivity extends AppCompatActivity {
             }
         });
 
+        textViewSeekBarDifficulty = findViewById(R.id.textViewSeekBarDifficulty);
         seekBarDifficulty = findViewById(R.id.seekBarDifficulty);
-        int difficulty = seekBarDifficulty.getProgress();
-        final String rating = String.valueOf(difficulty);
+        // perform seek bar change listener event used for getting the progress value
+        seekBarDifficulty.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progressChangedValue = 0;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressChangedValue = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                String rating = String.valueOf(progressChangedValue);
+                textViewSeekBarDifficulty.setText(rating);
+            }
+        });
 
         String[] arrayHours = new String[] {
             "2", "4", "6", "8", "12"
@@ -96,18 +122,39 @@ public class CreateScheduleActivity extends AppCompatActivity {
         spinnerWeekdays.setAdapter(adapter);
         spinnerWeekends.setAdapter(adapter);
 
-        listView = findViewById(R.id.listViewScheduleDetails);
-        final ArrayList<String> listItems = new ArrayList<String>(  );
+        listViewModule = findViewById(R.id.listViewScheduleModuleDetails);
+        final ArrayList<String> listItems = new ArrayList<String>();
         final ArrayAdapter<String> adapter3 = new ArrayAdapter<String>
                 (CreateScheduleActivity.this, android.R.layout.simple_list_item_1, listItems);
-        listView.setAdapter(adapter3);
+        listViewModule.setAdapter(adapter3);
+
+
+        listViewRating = findViewById(R.id.listViewScheduleRatingDetails);
+        final ArrayList<Integer> listItems1 = new ArrayList<Integer>(  );
+        final ArrayAdapter<Integer> adapter4 = new ArrayAdapter<Integer>
+                (CreateScheduleActivity.this, android.R.layout.simple_list_item_1, listItems1);
+        listViewRating.setAdapter(adapter4);
+
 
         buttonAdd = findViewById(R.id.buttonAdd);
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listItems.add(editTextModule.getText().toString() + " " + rating);
-                adapter3.notifyDataSetChanged();
+                String module = editTextModule.getText().toString();
+                if(module.isEmpty()){
+                    editTextModule.setError("Please enter your module name");
+                    editTextModule.requestFocus();
+                    return;
+                }
+                if(listItems.size()<10 && listItems1.size()<10){
+                    listItems.add(module);
+                    listItems1.add(Integer.parseInt(textViewSeekBarDifficulty.getText().toString()));
+                    adapter3.notifyDataSetChanged();
+                    adapter4.notifyDataSetChanged();
+                }
+                else{
+                    Toast.makeText(CreateScheduleActivity.this, "You can only add 10 modules",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -115,10 +162,163 @@ public class CreateScheduleActivity extends AppCompatActivity {
         buttonCreateSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ArrayList<String> modules = listItems;
+                ArrayList<Integer> ratings = listItems1;
+                String start = editTextStart.getText().toString();
+                String end = editTextEnd.getText().toString();
 
+                int weekday_hours = Integer.parseInt(spinnerWeekdays.getSelectedItem().toString());
+                int weekend_hours = Integer.parseInt(spinnerWeekends.getSelectedItem().toString());
+
+                if(start.isEmpty()) {
+                    editTextStart.setError("Please Enter Your Start Date");
+                    editTextStart.requestFocus();
+                    return;
+                }
+
+                else if(end.isEmpty()) {
+                    editTextEnd.setError("Please Enter Your End date");
+                    editTextEnd.requestFocus();
+                    return;
+                }
+
+                else if(listViewModule== null) {
+                    Toast.makeText(CreateScheduleActivity.this, "Please add your modules first",Toast.LENGTH_SHORT).show();
+                }
+
+                else if(listViewRating==null){
+                    Toast.makeText(CreateScheduleActivity.this, "Please add your ratings first", Toast.LENGTH_SHORT).show();
+                }
+
+                else {
+                    String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    Schedule schedule = new Schedule(
+                        user_id,start,end,weekday_hours,weekend_hours
+                    );
+                    mDatabaseSchedule.setValue(schedule);
+
+                    int total_study_hours = 0;
+                    try {
+                        total_study_hours = totalStudyHourCalculator(weekday_hours, weekend_hours, start, end);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    int total_rating = totalRatingCalculator(
+                           ratings
+                    );
+
+                    String[][] modules1 = moduleCreator(modules, ratings, total_study_hours, total_rating);
+                    sessionCreator(schedule, modules1);
+
+                }
             }
         });
 
+    }
+    //Session Creator Function
+    public void sessionCreator(Schedule schedule, String[][] modules1){
+
+    }
+
+    //Module Creator Function
+    public String[][] moduleCreator(ArrayList<String> modules, ArrayList<Integer> ratings, int total_study_hours, int total_rating){
+        String[][] modules1 = new String[10][4];
+        for(int i=0; i<modules.size() && i<ratings.size(); i++){
+                double average_rating = ratings.get(i)/total_rating;
+                int hours_per_module = (int) Math.round(total_study_hours*average_rating);
+                modules1[i][0] = modules.get(i);
+                modules1[i][1] = String.valueOf(ratings.get(i));
+                modules1[i][2] = String.valueOf(hours_per_module);
+                modules1[i][3] = String.valueOf(average_rating*100);
+
+            Module module = new Module(
+                    modules1[i][0],
+                    Integer.valueOf(modules1[i][1])
+            );
+        }
+
+        return modules1;
+    }
+    //Total Rating Calculator Function
+    public int totalRatingCalculator(ArrayList<Integer> ratings){
+        int total_rating = 0;
+        for(int i=0; i<ratings.size(); i++){
+            total_rating += ratings.get(i);
+        }
+        return total_rating;
+    }
+
+    //Total Study Hour Calculator Function
+    public int totalStudyHourCalculator(int weekday_hours, int weekend_hours, String start, String end) throws ParseException {
+        SimpleDateFormat format =  new SimpleDateFormat("dd/MM/yy", Locale.UK);
+        Date start_date = format.parse(start);
+        Date end_date = format.parse(end);
+
+        int no_week_days = getWeekDaysBetweenTwoDates(start_date,end_date);
+        int no_weekend_days = getWeekendDaysBetweenTwoDates(start_date, end_date);
+
+        int total_study_hours = (no_week_days * weekday_hours) + (no_weekend_days * weekend_hours);
+
+        return total_study_hours;
+    }
+
+    public int getWeekendDaysBetweenTwoDates(Date startDate, Date endDate) {
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(startDate);
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(endDate);
+
+        int weekendDays = 0;
+
+        //Return 0 if start and end are the same
+        if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
+            return 0;
+        }
+
+        if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
+            startCal.setTime(endDate);
+            endCal.setTime(startDate);
+        }
+
+        do {
+            startCal.add(Calendar.DAY_OF_MONTH, 1);
+            if (startCal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || startCal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+                ++weekendDays;
+            }
+        } while (startCal.getTimeInMillis() <= endCal.getTimeInMillis());
+
+        return weekendDays;
+    }
+
+    public int getWeekDaysBetweenTwoDates(Date startDate, Date endDate) {
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(startDate);
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(endDate);
+
+        int weekDays = 0;
+
+        //Return 0 if start and end are the same
+        if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
+            return 0;
+        }
+
+        if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
+            startCal.setTime(endDate);
+            endCal.setTime(startDate);
+        }
+
+        do {
+            startCal.add(Calendar.DAY_OF_MONTH, 1);
+            if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                ++weekDays;
+            }
+        } while (startCal.getTimeInMillis() <= endCal.getTimeInMillis());
+
+        return weekDays;
     }
 
     public void updateLabel(Calendar calendar){
