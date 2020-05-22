@@ -209,7 +209,11 @@ public class CreateScheduleActivity extends AppCompatActivity{
                     );
 
                     String[][] modules1 = moduleCreator(modules, ratings, total_study_hours, total_rating);
-                    sessionCreator(schedule, modules1);
+                    try {
+                        sessionCreator(weekday_hours, weekend_hours,start,end, modules1);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
 
                 }
             }
@@ -217,8 +221,81 @@ public class CreateScheduleActivity extends AppCompatActivity{
 
     }
     //Session Creator Function
-    public void sessionCreator(Schedule schedule, String[][] modules1){
-        
+    public void sessionCreator(int weekday_hours, int weekend_hours, String start, String end, String[][] modules1) throws ParseException {
+        SimpleDateFormat format =  new SimpleDateFormat("dd/MM/yy", Locale.UK);
+        Date start_date = format.parse(start);
+        Date end_date = format.parse(end);
+
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(start_date);
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(end_date);
+        //Loops through all the days of the schedule, checks if day is weekday or weekend and allocates hours according to users study ability
+       while(!startCal.after(endCal)){
+            //If it's a Weekday
+            if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                for (int x = 0; x < weekday_hours; x += 2) {
+                    if (modules1 != null) {
+                        // Generates a random key based on its weight
+                        while (true) {
+                            int random = (int) (Math.random() * 100 + 1);
+                            for (int j = 0; j < modules1.length; j++) {
+                                random -= Math.round(Double.valueOf(modules1[j][3]));
+
+                                if (random <= 0) {
+                                    break;
+                                }
+
+                                else if (random >modules1.length){
+                                    break;
+                                }
+
+                                else if (modules1.length <= 1) {
+                                    break;
+                                }
+
+                                else {
+                                    Session session = new Session(
+                                            modules1[random][0],
+                                            format.format(startCal.getTime())
+                                    );
+                                    Log.d("DEBUG", "This is the session module & start date for weekday" +" "+ session.getModule()+ " "+session.getDate());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        startCal.add(Calendar.DATE, 1);
+        }
+    }
+    //Number of Days Between Two Dates Function
+    public int getNumberOfDaysBetweenTwoDates(Date startDate, Date endDate){
+        Calendar startCal = Calendar.getInstance();
+        startCal.setTime(startDate);
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.setTime(endDate);
+
+        int days = 0;
+
+        //Return 0 if start and end are the same
+        if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
+            return 0;
+        }
+
+        if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
+            startCal.setTime(endDate);
+            endCal.setTime(startDate);
+        }
+
+        do {
+            startCal.add(Calendar.DAY_OF_MONTH, 1);
+            ++days;
+        } while (startCal.getTimeInMillis() < endCal.getTimeInMillis());
+
+        return days;
     }
 
     //Module Creator Function
@@ -227,9 +304,13 @@ public class CreateScheduleActivity extends AppCompatActivity{
         for(int i=0; i<modules.size() && i<ratings.size(); i++){
                 double average_rating = ratings.get(i)/total_rating;
                 int hours_per_module = (int) Math.round(total_study_hours*average_rating);
+                //Module
                 modules1[i][0] = modules.get(i);
+                //Rating
                 modules1[i][1] = String.valueOf(ratings.get(i));
+                //Hours
                 modules1[i][2] = String.valueOf(hours_per_module);
+                //Weight
                 modules1[i][3] = String.valueOf(average_rating*100);
 
             Module module = new Module(
