@@ -162,8 +162,6 @@ public class CreateScheduleActivity extends AppCompatActivity{
         buttonCreateSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> modules = listItems;
-                ArrayList<Integer> ratings = listItems1;
                 String start = editTextStart.getText().toString();
                 String end = editTextEnd.getText().toString();
 
@@ -205,15 +203,17 @@ public class CreateScheduleActivity extends AppCompatActivity{
                     }
 
                     int total_rating = totalRatingCalculator(
-                           ratings
+                           listItems1
                     );
 
-                    String[][] modules1 = moduleCreator(modules, ratings, total_study_hours, total_rating);
-                    try {
+                    String[][] modules1 = moduleCreator(listItems, listItems1, total_study_hours, total_rating);
+                    /*try {
                         sessionCreator(weekday_hours, weekend_hours,start,end, modules1);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
+
+                     */
 
                 }
             }
@@ -270,39 +270,19 @@ public class CreateScheduleActivity extends AppCompatActivity{
         startCal.add(Calendar.DATE, 1);
         }
     }
-    //Number of Days Between Two Dates Function
-    public int getNumberOfDaysBetweenTwoDates(Date startDate, Date endDate){
-        Calendar startCal = Calendar.getInstance();
-        startCal.setTime(startDate);
-
-        Calendar endCal = Calendar.getInstance();
-        endCal.setTime(endDate);
-
-        int days = 0;
-
-        //Return 0 if start and end are the same
-        if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
-            return 0;
-        }
-
-        if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
-            startCal.setTime(endDate);
-            endCal.setTime(startDate);
-        }
-
-        do {
-            startCal.add(Calendar.DAY_OF_MONTH, 1);
-            ++days;
-        } while (startCal.getTimeInMillis() < endCal.getTimeInMillis());
-
-        return days;
-    }
 
     //Module Creator Function
     public String[][] moduleCreator(ArrayList<String> modules, ArrayList<Integer> ratings, int total_study_hours, int total_rating){
         String[][] modules1 = new String[10][4];
-        for(int i=0; i<modules.size() && i<ratings.size(); i++){
-                double average_rating = ratings.get(i)/total_rating;
+        Log.d("DEBUG", "The total rating is: "+total_rating);
+
+        for(int i=0; i<modules.size(); i++) {
+            int a = ratings.get(i);
+            Log.d("DEBUG", "The rating is: " + a);
+            int average_rating = a/total_rating;
+            Log.d("DEBUG", "The average rating is: " + average_rating);
+        }
+               /*
                 int hours_per_module = (int) Math.round(total_study_hours*average_rating);
                 //Module
                 modules1[i][0] = modules.get(i);
@@ -317,7 +297,8 @@ public class CreateScheduleActivity extends AppCompatActivity{
                     modules1[i][0],
                     Integer.valueOf(modules1[i][1])
             );
-        }
+
+                */
 
         return modules1;
     }
