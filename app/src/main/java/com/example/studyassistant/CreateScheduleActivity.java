@@ -206,7 +206,7 @@ public class CreateScheduleActivity extends AppCompatActivity{
                            listItems1
                     );
 
-                    String[][] modules1 = moduleCreator(listItems, listItems1, total_study_hours, total_rating);
+                    String[][] modules1 = moduleCreator(listItems, listItems1, total_study_hours);
                     /*try {
                         sessionCreator(weekday_hours, weekend_hours,start,end, modules1);
                     } catch (ParseException e) {
@@ -235,70 +235,32 @@ public class CreateScheduleActivity extends AppCompatActivity{
        while(!startCal.after(endCal)){
             //If it's a Weekday
             if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-                for (int x = 0; x < weekday_hours; x += 2) {
-                    if (modules1 != null) {
-                        // Generates a random key based on its weight
-                        while (true) {
-                            int random = (int) (Math.random() * 100 + 1);
-                            for (int j = 0; j < modules1.length; j++) {
-                                random -= Math.round(Double.valueOf(modules1[j][3]));
 
-                                if (random <= 0) {
-                                    break;
-                                }
-
-                                else if (random >modules1.length){
-                                    break;
-                                }
-
-                                else if (modules1.length <= 1) {
-                                    break;
-                                }
-
-                                else {
-                                    Session session = new Session(
-                                            modules1[random][0],
-                                            format.format(startCal.getTime())
-                                    );
-                                    Log.d("DEBUG", "This is the session module & start date for weekday" +" "+ session.getModule()+ " "+session.getDate());
-                                }
-                            }
-                        }
-                    }
-                }
             }
         startCal.add(Calendar.DATE, 1);
         }
     }
 
     //Module Creator Function
-    public String[][] moduleCreator(ArrayList<String> modules, ArrayList<Integer> ratings, int total_study_hours, int total_rating){
-        String[][] modules1 = new String[10][4];
-        Log.d("DEBUG", "The total rating is: "+total_rating);
-
+    public String[][] moduleCreator(ArrayList<String> modules, ArrayList<Integer> ratings, int total_study_hours){
+        String[][] modules1 = new String[10][3];
+        int hours_per_module = total_study_hours/modules.size();
+        Log.d("DEBUG", ""+hours_per_module);
         for(int i=0; i<modules.size(); i++) {
-            int a = ratings.get(i);
-            Log.d("DEBUG", "The rating is: " + a);
-            int average_rating = a/total_rating;
-            Log.d("DEBUG", "The average rating is: " + average_rating);
-        }
-               /*
-                int hours_per_module = (int) Math.round(total_study_hours*average_rating);
-                //Module
-                modules1[i][0] = modules.get(i);
-                //Rating
-                modules1[i][1] = String.valueOf(ratings.get(i));
-                //Hours
-                modules1[i][2] = String.valueOf(hours_per_module);
-                //Weight
-                modules1[i][3] = String.valueOf(average_rating*100);
+            //Module
+            modules1[i][0] = modules.get(i);
+            //Rating
+            modules1[i][1] = String.valueOf(ratings.get(i));
+            //Hours
+            modules1[i][2] = String.valueOf(hours_per_module);
 
             Module module = new Module(
                     modules1[i][0],
-                    Integer.valueOf(modules1[i][1])
+                    Integer.parseInt(modules1[i][1])
             );
 
-                */
+            Log.d("DEBUG", "The module is: "+module.getName() + module.getRating());
+        }
 
         return modules1;
     }
