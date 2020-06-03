@@ -76,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menuItemCalendar:
+                Intent openCalendar = new Intent(MainActivity.this, CalendarActivity.class);
+                startActivity(openCalendar);
+                return true;
             case R.id.menuItemDashboard:
                 Intent openDashboard = new Intent(MainActivity.this, MainActivity.class);
                 startActivity(openDashboard);

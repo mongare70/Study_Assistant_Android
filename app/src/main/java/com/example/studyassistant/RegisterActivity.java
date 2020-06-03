@@ -97,7 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        else if (!(name.isEmpty() && email.isEmpty() && institution.isEmpty() && password.isEmpty())) {
+        else {
             mProgress.setMessage("Signing up...");
             mProgress.show();
 
@@ -122,10 +122,6 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 }
             });
-        }
-
-        else {
-            Toast.makeText(RegisterActivity.this, "Error Occurred!", Toast.LENGTH_SHORT).show();
         }
     }
 

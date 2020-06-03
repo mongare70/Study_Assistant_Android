@@ -24,6 +24,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/menuItemCalendar"
+        android:title="Calendar"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/menuItemAccount"
         android:title="Account"
         app:showAsAction="never" />
