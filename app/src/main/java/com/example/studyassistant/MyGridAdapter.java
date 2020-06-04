@@ -42,7 +42,7 @@ public class MyGridAdapter extends ArrayAdapter {
         Calendar dateCalendar = Calendar.getInstance();
         dateCalendar.setTime(monthDate);
         int DayNo = dateCalendar.get(Calendar.DAY_OF_MONTH);
-        int displayMonth = dateCalendar.get(Calendar.MONTH);
+        int displayMonth = dateCalendar.get(Calendar.MONTH)+1;
         int displayYear = dateCalendar.get(Calendar.YEAR);
         int currentMonth = currentDate.get(Calendar.MONTH)+1;
         int currentYear = currentDate.get(Calendar.YEAR);

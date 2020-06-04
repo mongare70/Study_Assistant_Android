@@ -19,6 +19,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -89,7 +91,7 @@ public class CustomCalendarView extends LinearLayout {
                     public void onClick(View v) {
                         Calendar calendar = Calendar.getInstance();
                         int hours = calendar.get(Calendar.HOUR_OF_DAY);
-                        int minute = calendar.get(Calendar.MINUTE);
+                        int minutes = calendar.get(Calendar.MINUTE);
                         TimePickerDialog timePickerDialog = new TimePickerDialog(addView.getContext(), R.style.Theme_AppCompat_Dialog
                                 , new TimePickerDialog.OnTimeSetListener() {
                             @Override
@@ -102,7 +104,7 @@ public class CustomCalendarView extends LinearLayout {
                                 String event_time = hformat.format(c.getTime());
                                 EventTime.setText(event_time);
                             }
-                        }, hours, minute, false);
+                        }, hours, minutes, false);
                         timePickerDialog.show();
                     }
                 });
@@ -127,6 +129,52 @@ public class CustomCalendarView extends LinearLayout {
             }
         });
 
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                String date = eventDateFormat.format(dates.get(position));
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setCancelable(true);
+                View showView = LayoutInflater.from(parent.getContext()).inflate(R.layout.show_events_layout, null);
+
+                RecyclerView recyclerView = showView.findViewById(R.id.EventsRV);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(showView.getContext());
+                recyclerView.setLayoutManager(layoutManager);
+                recyclerView.setHasFixedSize(true);
+                EventRecyclerAdapter eventRecyclerAdapter = new EventRecyclerAdapter(showView.getContext()
+                        , CollectEventsByDate(date));
+                recyclerView.setAdapter(eventRecyclerAdapter);
+                eventRecyclerAdapter.notifyDataSetChanged();
+
+                builder.setView(showView);
+                alertDialog = builder.create();
+                alertDialog.show();
+
+                return true;
+            }
+        });
+
+    }
+
+    private ArrayList<Event> CollectEventsByDate(String date){
+        ArrayList<Event> arrayList = new ArrayList<>();
+        dbOpenHelper = new DBOpenHelper(context);
+        SQLiteDatabase database = dbOpenHelper.getReadableDatabase();
+        Cursor cursor = dbOpenHelper.ReadEvents(date, database);
+        while (cursor.moveToNext()){
+            String event = cursor.getString(cursor.getColumnIndex(DBStructure.EVENT));
+            String time = cursor.getString(cursor.getColumnIndex(DBStructure.TIME));
+            String Date = cursor.getString(cursor.getColumnIndex(DBStructure.DATE));
+            String month = cursor.getString(cursor.getColumnIndex(DBStructure.MONTH));
+            String Year = cursor.getString(cursor.getColumnIndex(DBStructure.YEAR));
+            Event event1 = new Event(event, time, Date, month, Year);
+            arrayList.add(event1);
+        }
+        cursor.close();
+        dbOpenHelper.close();
+
+        return arrayList;
     }
 
     public CustomCalendarView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -160,7 +208,7 @@ public class CustomCalendarView extends LinearLayout {
         monthCalendar.add(Calendar.DAY_OF_MONTH, -FirstDayOfMonth);
         CollectEventsPerMonth(monthFormat.format(calendar.getTime()), yearFormat.format(calendar.getTime()));
 
-        while (dates.size() <MAX_CALENDAR_DAYS){
+        while (dates.size() < MAX_CALENDAR_DAYS){
             dates.add(monthCalendar.getTime());
             monthCalendar.add(Calendar.DAY_OF_MONTH, 1);
         }

@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "320019975117",
-    "firebase_url": "https://study-assistant-46ff0.firebaseio.com",
-    "project_id": "study-assistant-46ff0",
-    "storage_bucket": "study-assistant-46ff0.appspot.com"
+    "project_number": "264563444576",
+    "firebase_url": "https://study-assistant-20c61.firebaseio.com",
+    "project_id": "study-assistant-20c61",
+    "storage_bucket": "study-assistant-20c61.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:320019975117:android:730efb8f8b4fe528891284",
+        "mobilesdk_app_id": "1:264563444576:android:d66e8901efd93d4f7b6c05",
         "android_client_info": {
           "package_name": "com.example.studyassistant"
         }
       },
       "oauth_client": [
         {
-          "client_id": "320019975117-segkuqi44dle5469kcoplv7iu1covvs8.apps.googleusercontent.com",
+          "client_id": "264563444576-gv2saolj492bfel8ctok7fu5mloorjft.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCaa29kyE72hrSRPoL2LwtVRFi5IfiFFEI"
+          "current_key": "AIzaSyABVEVOmKPWm-549qOIbXPBgz_WM9bA4Ks"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "320019975117-segkuqi44dle5469kcoplv7iu1covvs8.apps.googleusercontent.com",
+              "client_id": "264563444576-gv2saolj492bfel8ctok7fu5mloorjft.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
