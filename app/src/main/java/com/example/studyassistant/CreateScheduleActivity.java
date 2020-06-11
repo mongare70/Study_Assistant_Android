@@ -2,17 +2,21 @@ package com.example.studyassistant;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,15 +28,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class CreateScheduleActivity extends AppCompatActivity{
-    private TextView textViewSeekBarDifficulty;
     private EditText editTextModule, editTextStart, editTextEnd;
-    private SeekBar seekBarDifficulty;
     private Spinner spinnerWeekdays, spinnerWeekends;
     private Button buttonAdd, buttonCreateSchedule;
-    private ListView listViewModule, listViewRating;
+    private TextView textViewModuleTime;
+    private ImageButton setModuleTime;
+    private CheckBox alarmMe;
+    private ListView listViewModule;
     private DatabaseReference mDatabaseSchedule, mDatabaseUsers;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser user;
@@ -47,6 +54,9 @@ public class CreateScheduleActivity extends AppCompatActivity{
         mDatabaseSchedule = FirebaseDatabase.getInstance().getReference("Schedules");
 
         editTextModule = findViewById(R.id.editTextModule);
+        textViewModuleTime = findViewById(R.id.textViewModuleTime);
+        setModuleTime = findViewById(R.id.setModuletime);
+        alarmMe = findViewById(R.id.alarmMe);
 
         //Start DatePicker EditText
         final Calendar myCalender = Calendar.getInstance();
@@ -88,28 +98,6 @@ public class CreateScheduleActivity extends AppCompatActivity{
             }
         });
 
-        textViewSeekBarDifficulty = findViewById(R.id.textViewSeekBarDifficulty);
-        seekBarDifficulty = findViewById(R.id.seekBarDifficulty);
-        // perform seek bar change listener event used for getting the progress value
-        seekBarDifficulty.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int progressChangedValue = 0;
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                progressChangedValue = progress;
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                String rating = String.valueOf(progressChangedValue);
-                textViewSeekBarDifficulty.setText(rating);
-            }
-        });
-
         String[] arrayHours = new String[] {
             "2", "4", "6", "8", "12"
         };
@@ -129,13 +117,6 @@ public class CreateScheduleActivity extends AppCompatActivity{
         listViewModule.setAdapter(adapter3);
 
 
-        listViewRating = findViewById(R.id.listViewScheduleRatingDetails);
-        final ArrayList<Integer> listItems1 = new ArrayList<Integer>(  );
-        final ArrayAdapter<Integer> adapter4 = new ArrayAdapter<Integer>
-                (CreateScheduleActivity.this, android.R.layout.simple_list_item_1, listItems1);
-        listViewRating.setAdapter(adapter4);
-
-
         buttonAdd = findViewById(R.id.buttonAdd);
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,15 +127,37 @@ public class CreateScheduleActivity extends AppCompatActivity{
                     editTextModule.requestFocus();
                     return;
                 }
-                if(listItems.size()<10 && listItems1.size()<10){
+                if(listItems.size()<10){
                     listItems.add(module);
-                    listItems1.add(Integer.parseInt(textViewSeekBarDifficulty.getText().toString()));
                     adapter3.notifyDataSetChanged();
-                    adapter4.notifyDataSetChanged();
                 }
                 else{
                     Toast.makeText(CreateScheduleActivity.this, "You can only add 10 modules",Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        setModuleTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                int hours = calendar.get(Calendar.HOUR_OF_DAY);
+                int minutes = calendar.get(Calendar.MINUTE);
+                TimePickerDialog timePickerDialog = new TimePickerDialog(v.getContext(), R.style.Theme_AppCompat_Dialog
+                        , new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        Calendar c = Calendar.getInstance();
+                        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        c.set(Calendar.MINUTE, minute);
+                        c.setTimeZone(TimeZone.getDefault());
+                        SimpleDateFormat hformat = new SimpleDateFormat("K:mm a", Locale.ENGLISH);
+                        String ModuleTime = hformat.format(c.getTime());
+                        textViewModuleTime.setText(ModuleTime);
+
+                    }
+                }, hours, minutes, false);
+                timePickerDialog.show();
             }
         });
 
@@ -180,13 +183,10 @@ public class CreateScheduleActivity extends AppCompatActivity{
                     return;
                 }
 
-                else if(listViewModule== null) {
-                    Toast.makeText(CreateScheduleActivity.this, "Please add your modules first",Toast.LENGTH_SHORT).show();
+                else if(listItems.size() == 0) {
+                    Toast.makeText(CreateScheduleActivity.this, "Please add your module(s)",Toast.LENGTH_SHORT).show();
                 }
 
-                else if(listViewRating==null){
-                    Toast.makeText(CreateScheduleActivity.this, "Please add your ratings first", Toast.LENGTH_SHORT).show();
-                }
 
                 else {
                     String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -195,106 +195,23 @@ public class CreateScheduleActivity extends AppCompatActivity{
                     );
                     mDatabaseSchedule.setValue(schedule);
 
-                    int total_study_hours = 0;
-                    try {
-                        total_study_hours = totalStudyHourCalculator(weekday_hours, weekend_hours, start, end);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
 
-                    int total_rating = totalRatingCalculator(
-                           listItems1
-                    );
-
-                    String[][] modules1 = moduleCreator(listItems, listItems1, total_study_hours);
-                    /*try {
-                        sessionCreator(weekday_hours, weekend_hours,start,end, modules1);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                     */
 
                 }
             }
         });
 
     }
-    //Session Creator Function
-    public void sessionCreator(int weekday_hours, int weekend_hours, String start, String end, String[][] modules1) throws ParseException {
-        SimpleDateFormat format =  new SimpleDateFormat("dd/MM/yy", Locale.UK);
-        Date start_date = format.parse(start);
-        Date end_date = format.parse(end);
 
-        Calendar startCal = Calendar.getInstance();
-        startCal.setTime(start_date);
 
-        Calendar endCal = Calendar.getInstance();
-        endCal.setTime(end_date);
-        //Loops through all the days of the schedule, checks if day is weekday or weekend and allocates hours according to users study ability
-       while(!startCal.after(endCal)){
-            //If it's a Weekday
-            if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-
-            }
-        startCal.add(Calendar.DATE, 1);
-        }
-    }
-
-    //Module Creator Function
-    public String[][] moduleCreator(ArrayList<String> modules, ArrayList<Integer> ratings, int total_study_hours){
-        String[][] modules1 = new String[10][3];
-        int hours_per_module = total_study_hours/modules.size();
-        Log.d("DEBUG", ""+hours_per_module);
-        for(int i=0; i<modules.size(); i++) {
-            //Module
-            modules1[i][0] = modules.get(i);
-            //Rating
-            modules1[i][1] = String.valueOf(ratings.get(i));
-            //Hours
-            modules1[i][2] = String.valueOf(hours_per_module);
-
-            Module module = new Module(
-                    modules1[i][0],
-                    Integer.parseInt(modules1[i][1])
-            );
-
-            Log.d("DEBUG", "The module is: "+module.getName() + module.getRating());
-        }
-
-        return modules1;
-    }
-    //Total Rating Calculator Function
-    public int totalRatingCalculator(ArrayList<Integer> ratings){
-        int total_rating = 0;
-        for(int i=0; i<ratings.size(); i++){
-            total_rating += ratings.get(i);
-        }
-        return total_rating;
-    }
-
-    //Total Study Hour Calculator Function
-    public int totalStudyHourCalculator(int weekday_hours, int weekend_hours, String start, String end) throws ParseException {
-        SimpleDateFormat format =  new SimpleDateFormat("dd/MM/yy", Locale.UK);
-        Date start_date = format.parse(start);
-        Date end_date = format.parse(end);
-
-        int no_week_days = getWeekDaysBetweenTwoDates(start_date,end_date);
-        int no_weekend_days = getWeekendDaysBetweenTwoDates(start_date, end_date);
-
-        int total_study_hours = (no_week_days * weekday_hours) + (no_weekend_days * weekend_hours);
-
-        return total_study_hours;
-    }
-
-    public int getWeekendDaysBetweenTwoDates(Date startDate, Date endDate) {
+    public int getDaysBetweenTwoDates(Date startDate, Date endDate) {
         Calendar startCal = Calendar.getInstance();
         startCal.setTime(startDate);
 
         Calendar endCal = Calendar.getInstance();
         endCal.setTime(endDate);
 
-        int weekendDays = 0;
+        int days = 0;
 
         //Return 0 if start and end are the same
         if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
@@ -308,42 +225,12 @@ public class CreateScheduleActivity extends AppCompatActivity{
 
         do {
             startCal.add(Calendar.DAY_OF_MONTH, 1);
-            if (startCal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || startCal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-                ++weekendDays;
-            }
+                ++days;
         } while (startCal.getTimeInMillis() <= endCal.getTimeInMillis());
 
-        return weekendDays;
+        return days;
     }
 
-    public int getWeekDaysBetweenTwoDates(Date startDate, Date endDate) {
-        Calendar startCal = Calendar.getInstance();
-        startCal.setTime(startDate);
-
-        Calendar endCal = Calendar.getInstance();
-        endCal.setTime(endDate);
-
-        int weekDays = 0;
-
-        //Return 0 if start and end are the same
-        if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
-            return 0;
-        }
-
-        if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
-            startCal.setTime(endDate);
-            endCal.setTime(startDate);
-        }
-
-        do {
-            startCal.add(Calendar.DAY_OF_MONTH, 1);
-            if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY && startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-                ++weekDays;
-            }
-        } while (startCal.getTimeInMillis() <= endCal.getTimeInMillis());
-
-        return weekDays;
-    }
 
     public void updateLabel(Calendar calendar){
         String myFormat = "dd/MM/yy";
